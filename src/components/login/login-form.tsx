@@ -15,7 +15,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-[400px] p-8 space-y-4 bg-white rounded-xl shadow-lg font-sans">
+    <div className="w-full max-w-[400px] p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       
       {/* Top Logo */}
       <div className="text-center">
@@ -55,7 +55,7 @@ export function LoginForm() {
       {/* Button */}
       <Button
         onClick={handleGetOtp}
-        className=" mt-10 w-full h-11 font-bold text-white bg-[#9C42FF] rounded-full hover:bg-[#8B5CF6] hover:text-extrabold "
+        className="w-full h-11 font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-[#8B5CF6]"
       >
         GET OTP
       </Button>
@@ -65,7 +65,7 @@ export function LoginForm() {
         <p className="text-sm">
           Don’t have an account?{' '}
         </p>
-        <div className="pt-2 text-center"><Link href="#" className="font-medium text-[#9C42FF] hover:underline hover:font-bold px-6">
+        <div className="pt-2 text-center"><Link href="/signup" className="font-medium text-[#9C42FF] hover:underline hover:font-bold px-6">
             Sign up
           </Link></div>
       </div>

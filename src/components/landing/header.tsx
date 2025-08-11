@@ -17,7 +17,9 @@ export function Header() {
           <Link href="/login" passHref>
             <Button variant="ghost" className="hover:font-bold">Login</Button>
           </Link>
-          <Button className="hover:font-bold" >Sign Up</Button>
+          <Link href="/signup" passHref>
+            <Button className="hover:font-bold" >Sign Up</Button>
+          </Link>
         </nav>
 
         <div className="md:hidden">
@@ -36,7 +38,9 @@ export function Header() {
                 <Link href="/login" passHref>
                   <Button variant="ghost" className="w-full justify-center text-lg">Login</Button>
                 </Link>
-                <Button className="w-full text-lg " style={{ backgroundColor: "#6F5CFF" }}>Sign Up</Button>
+                <Link href="/signup" passHref>
+                  <Button className="w-full text-lg " style={{ backgroundColor: "#6F5CFF" }}>Sign Up</Button>
+                </Link>
               </div>
             </SheetContent>
           </Sheet>
