@@ -15,7 +15,7 @@ export function SignupForm() {
   };
 
   return (
-    <div className="w-full max-w-[400px] p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
+    <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       
       {/* Top Logo */}
       <div className="text-center">
