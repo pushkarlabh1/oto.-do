@@ -38,7 +38,7 @@ export function SignupForm() {
               type="text" 
               value="+91" 
               readOnly 
-              className="w-20 h-12 px-6 text-right bg-white border-[#E0E0E0] rounded-lg"
+              className="w-20 h-12 text-center bg-white border-[#E0E0E0] rounded-lg"
             />
             <span className="absolute text-lg transform -translate-y-1/2 left-2 top-1/2">🇮🇳</span>
           </div>
@@ -56,7 +56,7 @@ export function SignupForm() {
       {/* Button */}
       <Button
         onClick={handleSignup}
-        className="w-full h-11 font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-[#8B5CF6]"
+        className="w-full h-11 font-bold text-xl text-white bg-[#9C42FF] rounded-full hover:bg-[#FFFFFF] hover:font-extrabold hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] "
       >
         SIGN UP
       </Button>

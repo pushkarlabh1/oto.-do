@@ -55,7 +55,7 @@ export function LoginForm() {
       {/* Button */}
       <Button
         onClick={handleGetOtp}
-        className="w-full h-11 font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-[#8B5CF6]"
+        className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold"
       >
         GET OTP
       </Button>
