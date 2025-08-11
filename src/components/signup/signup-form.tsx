@@ -3,7 +3,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from 'next/link';
 import { useState } from "react";
 
@@ -16,15 +15,15 @@ export function SignupForm() {
   };
 
   return (
-    <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
+    <div className="w-full max-w-[400px] p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       
       {/* Top Logo */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-[#9C42FF]">oto.do</h1>
+        <h1 className="text-4xl font-extrabold text-[#9C42FF]">oto.do</h1>
       </div>
 
       {/* Subtitle */}
-      <div className="space-y-2 text-center">
+      <div className="space-y-2 text-center pt-5">
         <h2 className="text-2xl font-bold text-[#9C42FF]">Sign Up to oto.do</h2>
         <p className="text-sm text-black">
           Enter your phone number to continue.
@@ -32,18 +31,16 @@ export function SignupForm() {
       </div>
 
       {/* Phone Number Section */}
-      <div className="space-y-2">
-        <Label htmlFor="phone-number" className="text-sm font-medium text-gray-700">Phone Number</Label>
+      <div className="space-y-4 pt-2">
         <div className="flex items-center space-x-2">
           <div className="relative">
             <Input 
               type="text" 
               value="+91" 
               readOnly 
-              className="w-24 h-12 pl-10 text-center bg-white border-[#E0E0E0] rounded-lg"
+              className="w-20 h-12 px-6 text-center bg-white border-[#E0E0E0] rounded-lg"
             />
-            <span className="absolute text-lg transform -translate-y-1/2 left-3 top-1/2">🇮🇳</span>
-            <span className="absolute transform -translate-y-1/2 right-3 top-1/2 text-gray-400">⌄</span>
+            <span className="absolute text-lg transform -translate-y-1/2 left-2 top-1/2">🇮🇳</span>
           </div>
           <Input
             id="phone-number"
@@ -59,16 +56,16 @@ export function SignupForm() {
       {/* Button */}
       <Button
         onClick={handleSignup}
-        className="w-full h-12 font-bold text-white bg-[#9C42FF] rounded-full hover:bg-[#8B5CF6]"
+        className="w-full h-11 font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-[#8B5CF6]"
       >
         SIGN UP
       </Button>
       
       {/* Footer */}
-      <div className="pt-4 text-center border-t border-gray-200">
+      <div className="pt-10 text-center">
         <p className="text-sm">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-[#9C42FF] hover:underline">
+          <Link href="/login" className="font-medium text-[#9C42FF] hover:underline hover:font-bold">
             Login
           </Link>
         </p>
