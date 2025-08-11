@@ -54,7 +54,7 @@ export function SignupForm() {
             placeholder="Select"
             searchPlaceholder="Search country..."
             notFoundText="No country found."
-            triggerClassName="w-auto px-2 h-12"
+            triggerClassName="w-auto px-2 h-12 rounded-lg"
           />
           <Input
             id="phone-number"

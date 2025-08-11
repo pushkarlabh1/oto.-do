@@ -49,7 +49,7 @@ export function LoginForm() {
             placeholder="Select"
             searchPlaceholder="Search country..."
             notFoundText="No country found."
-            triggerClassName="w-auto px-1 h-12"
+            triggerClassName="w-auto px-1 h-12 rounded-lg"
           />
           <Input
             type="tel"
