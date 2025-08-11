@@ -15,7 +15,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-[400px] p-8 space-y-4 bg-white rounded-xl shadow-lg">
+    <div className="w-full max-w-[400px] p-8 space-y-4 bg-white rounded-xl shadow-lg font-sans">
       
       {/* Top Logo */}
       <div className="text-center">
