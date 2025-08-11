@@ -38,7 +38,7 @@ export function SignupForm() {
               type="text" 
               value="+91" 
               readOnly 
-              className="w-20 h-12 px-6 text-center bg-white border-[#E0E0E0] rounded-lg"
+              className="w-20 h-12 px-6 text-right bg-white border-[#E0E0E0] rounded-lg"
             />
             <span className="absolute text-lg transform -translate-y-1/2 left-2 top-1/2">🇮🇳</span>
           </div>
@@ -62,10 +62,10 @@ export function SignupForm() {
       </Button>
       
       {/* Footer */}
-      <div className="pt-10 text-center">
-        <p className="text-sm">
+      <div className="pt-8 text-center">
+        <p className="text-lg">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-[#9C42FF] hover:underline hover:font-bold">
+          <Link href="/login" className="font-medium text-[#9C42FF] hover:underline hover:font-bold px-1">
             Login
           </Link>
         </p>
