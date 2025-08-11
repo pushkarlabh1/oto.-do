@@ -38,7 +38,7 @@ export function LoginForm() {
               type="text" 
               value="+91" 
               readOnly 
-              className="w-20 h-12 px-6 text-center bg-white border-[#E0E0E0] rounded-lg"
+              className="w-20 h-12 text-center bg-white border-[#E0E0E0] rounded-lg"
             />
             <span className="absolute text-lg transform -translate-y-1/2 left-2 top-1/2">🇮🇳</span>
           </div>
