@@ -5,13 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
 import { useState } from "react";
+import { Combobox } from "@/components/ui/combobox";
+import { countries } from "@/lib/countries";
+
 
 export function SignupForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
 
+  const countryOptions = countries.map(country => ({
+    value: `${country.flag} ${country.dial_code}`,
+    label: `${country.flag} ${country.name} (${country.dial_code})`,
+    code: country.dial_code,
+  }));
+
+  const defaultCountry = countryOptions.find(c => c.code === '+91');
+  const [countryValue, setCountryValue] = useState(defaultCountry?.value || "");
+
+
   const handleSignup = () => {
-    // Placeholder function for handling signup
-    console.log(`Signing up with: +91${phoneNumber}`);
+    const selectedCountry = countryOptions.find(c => c.value === countryValue);
+    const countryCode = selectedCountry ? selectedCountry.code : '';
+    console.log(`Signing up with: ${countryCode}${phoneNumber}`);
   };
 
   return (
@@ -33,15 +47,15 @@ export function SignupForm() {
       {/* Phone Number Section */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Input 
-              type="text" 
-              value="+91" 
-              readOnly 
-              className="w-20 h-12 text-center bg-white border-[#E0E0E0] rounded-lg"
-            />
-            <span className="absolute text-lg transform -translate-y-1/2 left-2 top-1/2">🇮🇳</span>
-          </div>
+        <Combobox
+            options={countryOptions}
+            value={countryValue}
+            onSelect={setCountryValue}
+            placeholder="Select"
+            searchPlaceholder="Search country..."
+            notFoundText="No country found."
+            triggerClassName="w-auto px-2 h-12"
+          />
           <Input
             id="phone-number"
             type="tel"
