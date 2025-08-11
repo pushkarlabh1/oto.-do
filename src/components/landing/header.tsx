@@ -36,10 +36,10 @@ export function Header() {
                   oto.do
                 </Link>
                 <Link href="/login" passHref>
-                  <Button variant="ghost" className="w-full justify-center text-lg">Login</Button>
+                  <Button variant="ghost" className="w-full justify-center text-lg hover:font-bold">Login</Button>
                 </Link>
                 <Link href="/signup" passHref>
-                  <Button className="w-full text-lg " style={{ backgroundColor: "#6F5CFF" }}>Sign Up</Button>
+                  <Button className="w-full text-lg hover:font-bold" style={{ backgroundColor: "#6F5CFF" }}>Sign Up</Button>
                 </Link>
               </div>
             </SheetContent>
