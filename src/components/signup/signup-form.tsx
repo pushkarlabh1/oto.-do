@@ -4,13 +4,21 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Combobox } from "@/components/ui/combobox";
 import { countries } from "@/lib/countries";
-
+import { auth } from '@/firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { useRouter } from 'next/navigation';
+import toast from "react-hot-toast";
+import { useAuth } from "@/context/auth-context";
+import { Loader2 } from "lucide-react";
 
 export function SignupForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { setConfirmationResult } = useAuth();
 
   const countryOptions = countries.map(country => ({
     value: `${country.flag} ${country.dial_code}`,
@@ -21,15 +29,61 @@ export function SignupForm() {
   const defaultCountry = countryOptions.find(c => c.code === '+91');
   const [countryValue, setCountryValue] = useState(defaultCountry?.value || "");
 
+  useEffect(() => {
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      'size': 'invisible',
+      'callback': () => {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+      },
+    });
+    (window as any).recaptchaVerifier = verifier;
 
-  const handleSignup = () => {
+    return () => {
+      verifier.clear();
+      (window as any).recaptchaVerifier = null;
+    };
+  }, []);
+
+  const handleSignup = async () => {
+    setIsLoading(true);
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
     const countryCode = selectedCountry ? selectedCountry.code : '';
-    console.log(`Signing up with: ${countryCode}${phoneNumber}`);
+    const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+
+    if (phoneNumber.length >= 10 && (window as any).recaptchaVerifier) {
+      const appVerifier = (window as any).recaptchaVerifier;
+      try {
+        const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
+        setConfirmationResult(confirmationResult);
+        toast.success("OTP sent successfully!");
+        router.push('/verify-otp');
+      } catch (error: any) {
+        console.error("Error sending OTP", error);
+        if (error.code === 'auth/too-many-requests') {
+          toast.error("Too many requests. Please try again later.");
+        } else {
+          toast.error("Failed to send OTP. Please check your phone number or try again later.");
+        }
+        // Reset reCAPTCHA to allow retries
+        if ((window as any).recaptchaVerifier) {
+          (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
+            if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
+              grecaptcha.reset(widgetId);
+            }
+          });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      toast.error("Please enter a valid phone number.");
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
+      <div id="recaptcha-container"></div>
       
       {/* Top Logo */}
       <div className="text-center">
@@ -63,6 +117,7 @@ export function SignupForm() {
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="h-12 border-[#E0E0E0] rounded-lg px-3"
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -71,8 +126,9 @@ export function SignupForm() {
       <Button
         onClick={handleSignup}
         className="w-full h-11 font-bold text-xl text-white bg-[#9C42FF] rounded-full hover:bg-[#FFFFFF] hover:font-extrabold hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] "
+        disabled={isLoading}
       >
-        SIGN UP
+        {isLoading ? <Loader2 className="animate-spin" /> : 'SIGN UP'}
       </Button>
       
       {/* Footer */}

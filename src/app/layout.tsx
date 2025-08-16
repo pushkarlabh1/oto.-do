@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
   title: 'oto.do AI Automation Platform',
@@ -23,8 +25,11 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased bg-background">
-        {children}
-        <Toaster />
+        <AuthProvider>
+          <Toaster />
+          {children}
+          <ShadcnToaster />
+        </AuthProvider>
       </body>
     </html>
   );

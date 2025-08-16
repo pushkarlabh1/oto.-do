@@ -21,7 +21,7 @@ export function Hero() {
         </h1>
 
         <p className="mx-auto mt-4 max-w-4xl text-lg text-muted-foreground sm:text-2xl">
-          Put automations & agents to work for important stuff in your life.
+          Automation agents for a simpler life
         </p>
         <div className="mt-8">
           <Button size="lg" className="shadow-lg text-lg sm:text-xl md:text-2xl font-semibold text-white px-6 sm:px-8 hover:font-bold hover:bg-[#5a59de]" style={{ backgroundColor: "#6F5CFF" }} >

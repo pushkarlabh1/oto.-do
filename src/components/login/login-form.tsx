@@ -4,13 +4,22 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Combobox } from "@/components/ui/combobox";
 import { countries } from "@/lib/countries";
+import { auth } from '@/firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { useRouter } from 'next/navigation';
+import toast from "react-hot-toast";
+import { useAuth } from "@/context/auth-context";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { setConfirmationResult } = useAuth();
+
   const countryOptions = countries.map(country => ({
     value: `${country.flag} ${country.dial_code}`,
     label: `${country.flag} ${country.name} (${country.dial_code})`,
@@ -20,14 +29,61 @@ export function LoginForm() {
   const defaultCountry = countryOptions.find(c => c.code === '+91');
   const [countryValue, setCountryValue] = useState(defaultCountry?.value || "");
 
-  const handleGetOtp = () => {
+  useEffect(() => {
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      'size': 'invisible',
+      'callback': () => {
+        // reCAPTCHA solved
+      },
+    });
+    (window as any).recaptchaVerifier = verifier;
+
+    return () => {
+      verifier.clear();
+      (window as any).recaptchaVerifier = null;
+    };
+  }, []);
+
+  const handleGetOtp = async () => {
+    setIsLoading(true);
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
     const countryCode = selectedCountry ? selectedCountry.code : '';
-    console.log(`Getting OTP for: ${countryCode}${phoneNumber}`);
+    const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+
+    if (phoneNumber.length >= 10 && (window as any).recaptchaVerifier) {
+      const appVerifier = (window as any).recaptchaVerifier;
+      try {
+        const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
+        setConfirmationResult(confirmationResult);
+        toast.success("OTP sent successfully!");
+        router.push('/verify-login');
+      } catch (error: any) {
+        console.error("Error sending OTP", error);
+        if (error.code === 'auth/too-many-requests') {
+          toast.error("Too many requests. Please try again later.");
+        } else {
+          toast.error("Failed to send OTP. Please check your phone number or try again later.");
+        }
+        // Reset reCAPTCHA to allow retries
+        if ((window as any).recaptchaVerifier) {
+          (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
+            if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
+              grecaptcha.reset(widgetId);
+            }
+          });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      toast.error("Please enter a valid phone number.");
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
+      <div id="recaptcha-container"></div>
       
       <div className="text-center">
         <h1 className="text-4xl font-extrabold text-[#9C42FF]">oto.do</h1>
@@ -50,13 +106,14 @@ export function LoginForm() {
             searchPlaceholder="Search country..."
             notFoundText="No country found."
             triggerClassName="w-auto px-1 h-12 rounded-lg"
-          />
+            />
           <Input
             type="tel"
             placeholder="Enter phone number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="h-12 border-[#E0E0E0] rounded-lg px-3"
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -64,8 +121,9 @@ export function LoginForm() {
       <Button
         onClick={handleGetOtp}
         className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold"
+        disabled={isLoading}
       >
-        GET OTP
+        {isLoading ? <Loader2 className="animate-spin" /> : 'GET OTP'}
       </Button>
       
       <div className="pt-10 text-center">
