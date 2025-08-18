@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 // src/lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth, indexedDBLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -15,7 +15,11 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+// Use initializeAuth for persistent login
+const auth = initializeAuth(app, {
+  persistence: indexedDBLocalPersistence
+});
+
+export { auth };
 export const db = getFirestore(app);
 export { app };
-

@@ -45,12 +45,17 @@ export function LoginForm() {
   }, []);
 
   const handleGetOtp = async () => {
+    if (phoneNumber.length !== 10) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      return;
+    }
+
     setIsLoading(true);
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
     const countryCode = selectedCountry ? selectedCountry.code : '';
     const fullPhoneNumber = `${countryCode}${phoneNumber}`;
 
-    if (phoneNumber.length >= 10 && (window as any).recaptchaVerifier) {
+    if ((window as any).recaptchaVerifier) {
       const appVerifier = (window as any).recaptchaVerifier;
       try {
         const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
@@ -67,8 +72,8 @@ export function LoginForm() {
         // Reset reCAPTCHA to allow retries
         if ((window as any).recaptchaVerifier) {
           (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
-            if (typeof grecaptcha !== 'undefined' && grecaptcha.reset) {
-              grecaptcha.reset(widgetId);
+            if (typeof (window as any).grecaptcha !== 'undefined' && (window as any).grecaptcha.reset) {
+              (window as any).grecaptcha.reset(widgetId);
             }
           });
         }
@@ -76,10 +81,15 @@ export function LoginForm() {
         setIsLoading(false);
       }
     } else {
-      toast.error("Please enter a valid phone number.");
+      toast.error("reCAPTCHA not initialized. Please try again.");
       setIsLoading(false);
     }
   };
+  
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleGetOtp();
+  }
 
   return (
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
@@ -96,35 +106,38 @@ export function LoginForm() {
         </p>
       </div>
 
-      <div className="space-y-4 pt-2">
-        <div className="flex items-center space-x-2 ">
-        <Combobox
-            options={countryOptions}
-            value={countryValue}
-            onSelect={setCountryValue}
-            placeholder="Select"
-            searchPlaceholder="Search country..."
-            notFoundText="No country found."
-            triggerClassName="w-auto px-1 h-12 rounded-lg"
+      <form onSubmit={handleFormSubmit} className="space-y-6">
+        <div className="space-y-4 pt-2">
+          <div className="flex items-center space-x-2 ">
+          <Combobox
+              options={countryOptions}
+              value={countryValue}
+              onSelect={setCountryValue}
+              placeholder="Select"
+              searchPlaceholder="Search country..."
+              notFoundText="No country found."
+              triggerClassName="w-auto px-1 h-12 rounded-lg"
+              />
+            <Input
+              type="tel"
+              placeholder="Enter phone number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+              maxLength={10}
+              className="h-12 border-[#E0E0E0] rounded-lg px-3"
+              disabled={isLoading}
             />
-          <Input
-            type="tel"
-            placeholder="Enter phone number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="h-12 border-[#E0E0E0] rounded-lg px-3"
-            disabled={isLoading}
-          />
+          </div>
         </div>
-      </div>
 
-      <Button
-        onClick={handleGetOtp}
-        className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold"
-        disabled={isLoading}
-      >
-        {isLoading ? <Loader2 className="animate-spin" /> : 'GET OTP'}
-      </Button>
+        <Button
+          type="submit"
+          className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold"
+          disabled={isLoading}
+        >
+          {isLoading ? <Loader2 className="animate-spin" /> : 'GET OTP'}
+        </Button>
+      </form>
       
       <div className="pt-10 text-center">
         <p className="text-sm">

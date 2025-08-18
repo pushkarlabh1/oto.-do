@@ -17,6 +17,11 @@ export function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen && isMobile) {
@@ -74,6 +79,10 @@ export function Chatbot() {
       }
     }
   }, [messages]);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>

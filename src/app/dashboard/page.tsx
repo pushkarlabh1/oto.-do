@@ -2,50 +2,65 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 import { auth, db } from "@/firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { currentUser, loading: authLoading } = useAuth();
   const [displayName, setDisplayName] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        router.replace("/login");
-        return;
-      }
+    // Wait for Firebase auth to finish loading
+    if (authLoading) {
+      return;
+    }
+
+    // If no user, redirect to login
+    if (!currentUser) {
+      router.replace("/login");
+      return;
+    }
+
+    const fetchUserData = async () => {
       try {
-        const ref = doc(db, "users", user.uid);
+        const ref = doc(db, "users", currentUser.uid);
         const snap = await getDoc(ref);
-        if (snap.exists()) {
+        if (snap.exists() && snap.data().name) {
           const data = snap.data() as { name?: string };
           setDisplayName(data.name ?? "");
         } else {
+          // If user exists but has no name, redirect to set it
           router.replace("/enter-name");
           return;
         }
       } catch (e) {
-        console.error(e);
+        console.error("Error fetching user data:", e);
+        // Optionally handle error, e.g., show a toast message
       } finally {
-        setLoading(false);
+        setPageLoading(false);
       }
-    });
+    };
 
-    return () => unsub();
-  }, [router]);
+    fetchUserData();
+  }, [currentUser, authLoading, router]);
 
   const handleLogout = async () => {
     await signOut(auth);
     router.replace("/login");
   };
 
-  if (loading) {
+  if (authLoading || pageLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#F9F7FE]">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+          <p className="mt-4 text-lg">Loading Dashboard...</p>
+        </div>
       </div>
     );
   }

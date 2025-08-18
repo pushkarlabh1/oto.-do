@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,17 +10,20 @@ import toast from "react-hot-toast";
 // Firebase imports
 import { auth, db } from "@/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { useAuth } from "@/context/auth-context";
 
 export function EnterNameForm() {
   const router = useRouter();
+  const { currentUser, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
 
   // If someone lands here without being signed in, send them to login
   useEffect(() => {
-    const u = auth.currentUser;
-    if (!u) router.replace("/login");
-  }, [router]);
+    if (!authLoading && !currentUser) {
+      router.replace("/login");
+    }
+  }, [router, currentUser, authLoading]);
 
   const handleContinue = async () => {
     const trimmed = name.trim();

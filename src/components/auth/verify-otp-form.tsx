@@ -1,17 +1,25 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/auth-context";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export function VerifyOtpForm() {
   const [otp, setOtp] = useState('');
   const router = useRouter();
   const { confirmationResult } = useAuth();
 
+  useEffect(() => {
+    if (!confirmationResult) {
+      toast.error("Verification session expired. Please try again.");
+      router.replace('/signup');
+    }
+  }, [confirmationResult, router]);
+  
   const handleVerifyOtp = async () => {
     if (!confirmationResult) {
       toast.error("Verification session expired. Please try again.");
@@ -33,6 +41,11 @@ export function VerifyOtpForm() {
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleVerifyOtp();
+  };
+
   return (
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       
@@ -47,23 +60,27 @@ export function VerifyOtpForm() {
         </p>
       </div>
 
-      <div className="space-y-4 pt-2">
-        <Input
-          type="text"
-          placeholder="Enter OTP"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          className="h-12 border-[#E0E0E0] rounded-lg px-3 text-center tracking-[0.5em]"
-          maxLength={6}
-        />
-      </div>
+      <form onSubmit={handleFormSubmit} className="space-y-6">
+        <div className="space-y-4 pt-2 flex justify-center">
+          <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+              <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+              </InputOTPGroup>
+          </InputOTP>
+        </div>
 
-      <Button
-        onClick={handleVerifyOtp}
-        className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold"
-      >
-        VERIFY OTP
-      </Button>
+        <Button
+          type="submit"
+          className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold"
+        >
+          VERIFY OTP
+        </Button>
+      </form>
     </div>
   );
 }
