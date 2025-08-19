@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Combobox } from "@/components/ui/combobox";
 import { countries } from "@/lib/countries";
 import { auth } from '@/firebase';
@@ -29,21 +29,6 @@ export function LoginForm() {
   const defaultCountry = countryOptions.find(c => c.code === '+91');
   const [countryValue, setCountryValue] = useState(defaultCountry?.value || "");
 
-  useEffect(() => {
-    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      'size': 'invisible',
-      'callback': () => {
-        // reCAPTCHA solved
-      },
-    });
-    (window as any).recaptchaVerifier = verifier;
-
-    return () => {
-      verifier.clear();
-      (window as any).recaptchaVerifier = null;
-    };
-  }, []);
-
   const handleGetOtp = async () => {
     if (phoneNumber.length !== 10) {
       toast.error("Please enter a valid 10-digit phone number.");
@@ -54,34 +39,28 @@ export function LoginForm() {
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
     const countryCode = selectedCountry ? selectedCountry.code : '';
     const fullPhoneNumber = `${countryCode}${phoneNumber}`;
-
-    if ((window as any).recaptchaVerifier) {
-      const appVerifier = (window as any).recaptchaVerifier;
-      try {
-        const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
-        setConfirmationResult(confirmationResult);
-        toast.success("OTP sent successfully!");
-        router.push('/verify-login');
-      } catch (error: any) {
-        console.error("Error sending OTP", error);
-        if (error.code === 'auth/too-many-requests') {
-          toast.error("Too many requests. Please try again later.");
-        } else {
-          toast.error("Failed to send OTP. Please check your phone number or try again later.");
-        }
-        // Reset reCAPTCHA to allow retries
-        if ((window as any).recaptchaVerifier) {
-          (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
-            if (typeof (window as any).grecaptcha !== 'undefined' && (window as any).grecaptcha.reset) {
-              (window as any).grecaptcha.reset(widgetId);
-            }
-          });
-        }
-      } finally {
-        setIsLoading(false);
+    
+    try {
+      // Ensure the container is clean before rendering
+      if ((window as any).recaptchaContainer) {
+        (window as any).recaptchaContainer.innerHTML = '';
       }
-    } else {
-      toast.error("reCAPTCHA not initialized. Please try again.");
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
+
+      const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, verifier);
+      setConfirmationResult(confirmationResult);
+      toast.success("OTP sent successfully!");
+      router.push('/verify-login');
+    } catch (error: any) {
+      console.error("Error sending OTP", error);
+      if (error.code === 'auth/too-many-requests') {
+        toast.error("Too many requests. Please try again later.");
+      } else {
+        toast.error("Failed to send OTP. Please check your phone number or try again later.");
+      }
+    } finally {
       setIsLoading(false);
     }
   };

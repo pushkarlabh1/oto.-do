@@ -26,7 +26,15 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background">
         <AuthProvider>
-          <Toaster />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              success: {
+                // apply a class that forces single line and allows wider width on desktop
+                className: 'toast-one-line',
+              },
+            }}
+          />
           {children}
           <ShadcnToaster />
         </AuthProvider>

@@ -74,3 +74,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Force toast text to a single line and allow wider width on desktop */
+.toast-one-line {
+  white-space: nowrap;      /* single line */
+  overflow: hidden;         /* prevent overflow artifacts */
+  text-overflow: ellipsis;  /* gracefully truncate if needed on narrow viewports */
+}
+
+@media (min-width: 768px) {
+  .toast-one-line {
+    max-width: none !important;  /* remove library’s width cap so it can stay one line */
+    width: auto !important;
+  }
+}
