@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -26,6 +26,7 @@ export function SignupForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [countryValue, setCountryValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
 
   const countryOptions = useMemo(
     () =>
@@ -37,10 +38,21 @@ export function SignupForm() {
     []
   );
 
-  useState(() => {
+  useEffect(() => {
     const def = countryOptions.find((c) => c.code === "+91");
-    setCountryValue(def?.value || "");
-  });
+    if (def) {
+      setCountryValue(def.value);
+    }
+  }, [countryOptions]);
+
+  useEffect(() => {
+    if (!recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
+      setRecaptchaVerifier(verifier);
+    }
+  }, [recaptchaVerifier]);
 
   function normalizePhone(localDigits: string, dialCode: string) {
     const digitsOnly = localDigits.replace(/\D+/g, "");
@@ -52,18 +64,14 @@ export function SignupForm() {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
+    if (!recaptchaVerifier) {
+      toast.error("reCAPTCHA not ready. Please wait a moment and try again.");
+      return;
+    }
     
     setIsLoading(true);
 
     try {
-      if ((window as any).grecaptcha) {
-        (window as any).grecaptcha.reset();
-      }
-
-      const appVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-      });
-
       const selectedCountry = countryOptions.find((c) => c.value === countryValue);
       const dialCode = selectedCountry ? selectedCountry.code : "";
       const fullPhoneNumber = normalizePhone(phoneNumber, dialCode);
@@ -77,7 +85,7 @@ export function SignupForm() {
         const confirmationResult = await signInWithPhoneNumber(
           auth,
           fullPhoneNumber,
-          appVerifier
+          recaptchaVerifier
         );
         setConfirmationResult(confirmationResult);
         router.push("/verify-login");
@@ -87,17 +95,13 @@ export function SignupForm() {
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         fullPhoneNumber,
-        appVerifier
+        recaptchaVerifier
       );
       setConfirmationResult(confirmationResult);
       toast.success("OTP sent successfully!");
       router.push("/verify-otp");
     } catch (error: any) {
       console.error("Error sending OTP", error);
-      
-      if ((window as any).grecaptcha) {
-        (window as any).grecaptcha.reset();
-      }
 
       if (error?.code === "auth/invalid-phone-number") {
         toast.error("Invalid phone number format. Include country code, e.g., +91XXXXXXXXXX.");
@@ -107,6 +111,15 @@ export function SignupForm() {
         toast.error(error.message);
       } else {
         toast.error("Failed to send OTP. Please try again.");
+      }
+      
+      // Reset reCAPTCHA on error
+      if (recaptchaVerifier) {
+        recaptchaVerifier.render().then((widgetId) => {
+          if ((window as any).grecaptcha) {
+            (window as any).grecaptcha.reset(widgetId);
+          }
+        });
       }
     } finally {
       setIsLoading(false);
@@ -123,7 +136,7 @@ export function SignupForm() {
       <div id="recaptcha-container" />
 
       <div className="space-y-2 text-center pt-5">
-        <h2 className="text-2xl font-bold text-[#9C42FF]">Sign Up to oto.do</h2>
+        <h2 className="text-2xl font-bold">Create your account</h2>
         <p className="text-sm text-black">Enter your phone number to continue.</p>
       </div>
 

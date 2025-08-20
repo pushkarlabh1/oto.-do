@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Combobox } from "@/components/ui/combobox";
 import { countries } from "@/lib/countries";
 import { auth, db } from '@/firebase';
@@ -20,6 +20,8 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { setConfirmationResult } = useAuth();
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
+
 
   const countryOptions = useMemo(
     () =>
@@ -34,6 +36,15 @@ export function LoginForm() {
   const defaultCountry = useMemo(() => countryOptions.find(c => c.code === '+91'), [countryOptions]);
   const [countryValue, setCountryValue] = useState(defaultCountry?.value || "");
 
+  useEffect(() => {
+    if (!recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+      });
+      setRecaptchaVerifier(verifier);
+    }
+  }, [recaptchaVerifier]);
+
   function normalizePhone(localDigits: string, dialCode: string) {
     const digitsOnly = localDigits.replace(/\D+/g, "");
     return `${dialCode}${digitsOnly}`;
@@ -44,6 +55,10 @@ export function LoginForm() {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
+    if (!recaptchaVerifier) {
+      toast.error("reCAPTCHA not ready. Please wait a moment and try again.");
+      return;
+    }
 
     setIsLoading(true);
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
@@ -51,18 +66,10 @@ export function LoginForm() {
     const fullPhoneNumber = normalizePhone(phoneNumber, countryCode);
     
     try {
-      if ((window as any).grecaptcha) {
-        (window as any).grecaptcha.reset();
-      }
-
-      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-      });
-
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("phone", "==", fullPhoneNumber), limit(1));
       const snap = await getDocs(q);
-      const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, verifier);
+      const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, recaptchaVerifier);
       setConfirmationResult(confirmationResult);
 
       if (snap.empty) {
@@ -75,13 +82,18 @@ export function LoginForm() {
       }
     } catch (error: any) {
       console.error("Error sending OTP", error);
-      if ((window as any).grecaptcha) {
-        (window as any).grecaptcha.reset();
-      }
       if (error.code === 'auth/too-many-requests') {
         toast.error("Too many requests. Please try again later.");
       } else {
         toast.error("Failed to send OTP. Please check your phone number or try again later.");
+      }
+      // Reset reCAPTCHA on error
+      if (recaptchaVerifier) {
+        recaptchaVerifier.render().then((widgetId) => {
+          if ((window as any).grecaptcha) {
+            (window as any).grecaptcha.reset(widgetId);
+          }
+        });
       }
     } finally {
       setIsLoading(false);
@@ -98,7 +110,7 @@ export function LoginForm() {
       <div id="recaptcha-container"></div>
       
       <div className="space-y-2 text-center pt-5">
-        <h2 className="text-2xl font-bold text-[#9C42FF]">Login to oto.do</h2>
+        <h2 className="text-2xl font-bold">Login to your account</h2>
         <p className="text-sm text-black">
           Enter your phone number to continue.
         </p>

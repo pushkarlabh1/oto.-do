@@ -74,7 +74,7 @@ export function VerifyLoginOtpForm() {
       </div>
 
       <form onSubmit={handleFormSubmit} className="space-y-6">
-        <div className="space-y-4 pt-2 flex justify-center">
+        <div className="space-y-4 pt-2 flex justify-center flex-wrap">
           <InputOTP maxLength={6} value={otp} onChange={setOtp}>
             <InputOTPGroup>
               <InputOTPSlot index={0} />
