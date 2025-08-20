@@ -28,6 +28,9 @@ export default function RootLayout({
         <AuthProvider>
           <Toaster
             position="top-center"
+            containerStyle={{
+              top: 80,
+            }}
             toastOptions={{
               success: {
                 // apply a class that forces single line and allows wider width on desktop

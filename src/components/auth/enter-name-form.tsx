@@ -72,10 +72,6 @@ export function EnterNameForm() {
 
   return (
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
-      <div className="text-center">
-        <h1 className="text-4xl font-extrabold text-[#9C42FF]">oto.do</h1>
-      </div>
-
       <div className="space-y-2 text-center pt-5">
         <h2 className="text-2xl font-bold text-[#9C42FF]">Enter Your Name</h2>
         <p className="text-sm text-black">Please enter your name to continue.</p>

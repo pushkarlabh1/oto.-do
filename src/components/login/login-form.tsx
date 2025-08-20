@@ -4,11 +4,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from 'next/link';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Combobox } from "@/components/ui/combobox";
 import { countries } from "@/lib/countries";
-import { auth } from '@/firebase';
+import { auth, db } from '@/firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { collection, query, where, getDocs, limit } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/auth-context";
@@ -20,14 +21,23 @@ export function LoginForm() {
   const router = useRouter();
   const { setConfirmationResult } = useAuth();
 
-  const countryOptions = countries.map(country => ({
-    value: `${country.flag} ${country.dial_code}`,
-    label: `${country.flag} ${country.name} (${country.dial_code})`,
-    code: country.dial_code,
-  }));
+  const countryOptions = useMemo(
+    () =>
+      countries.map((country) => ({
+        value: `${country.flag} ${country.dial_code}`,
+        label: `${country.flag} ${country.name} (${country.dial_code})`,
+        code: country.dial_code,
+      })),
+    []
+  );
 
-  const defaultCountry = countryOptions.find(c => c.code === '+91');
+  const defaultCountry = useMemo(() => countryOptions.find(c => c.code === '+91'), [countryOptions]);
   const [countryValue, setCountryValue] = useState(defaultCountry?.value || "");
+
+  function normalizePhone(localDigits: string, dialCode: string) {
+    const digitsOnly = localDigits.replace(/\D+/g, "");
+    return `${dialCode}${digitsOnly}`;
+  }
 
   const handleGetOtp = async () => {
     if (phoneNumber.length !== 10) {
@@ -38,23 +48,36 @@ export function LoginForm() {
     setIsLoading(true);
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
     const countryCode = selectedCountry ? selectedCountry.code : '';
-    const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+    const fullPhoneNumber = normalizePhone(phoneNumber, countryCode);
     
     try {
-      // Ensure the container is clean before rendering
-      if ((window as any).recaptchaContainer) {
-        (window as any).recaptchaContainer.innerHTML = '';
+      if ((window as any).grecaptcha) {
+        (window as any).grecaptcha.reset();
       }
+
       const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
       });
 
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("phone", "==", fullPhoneNumber), limit(1));
+      const snap = await getDocs(q);
       const confirmationResult = await signInWithPhoneNumber(auth, fullPhoneNumber, verifier);
       setConfirmationResult(confirmationResult);
-      toast.success("OTP sent successfully!");
-      router.push('/verify-login');
+
+      if (snap.empty) {
+        // This is a new user, send them to the signup OTP page with a query param.
+        router.push('/verify-otp?new_user=true');
+      } else {
+        // This is an existing user, send them to the login verification page.
+        toast.success("OTP sent successfully!");
+        router.push('/verify-login');
+      }
     } catch (error: any) {
       console.error("Error sending OTP", error);
+      if ((window as any).grecaptcha) {
+        (window as any).grecaptcha.reset();
+      }
       if (error.code === 'auth/too-many-requests') {
         toast.error("Too many requests. Please try again later.");
       } else {
@@ -74,10 +97,6 @@ export function LoginForm() {
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       <div id="recaptcha-container"></div>
       
-      <div className="text-center">
-        <h1 className="text-4xl font-extrabold text-[#9C42FF]">oto.do</h1>
-      </div>
-
       <div className="space-y-2 text-center pt-5">
         <h2 className="text-2xl font-bold text-[#9C42FF]">Login to oto.do</h2>
         <p className="text-sm text-black">

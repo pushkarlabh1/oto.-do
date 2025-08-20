@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { auth, db } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
+import { AuthHeader } from "@/components/auth/auth-header";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -67,6 +69,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F9F7FE]">
+      <AuthHeader />
       <header className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Welcome, {displayName}</h2>
         <button
@@ -79,7 +82,7 @@ export default function DashboardPage() {
 
       <main className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-xl shadow p-6">
-          <p>Your dashboard is ready.</p>
+          <p>You are in waitlist for early access</p>
         </div>
       </main>
     </div>

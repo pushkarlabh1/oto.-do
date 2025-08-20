@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { BarChart3, Heart, Car } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 
 const integrationCategories = {
   commute: {
@@ -50,6 +53,17 @@ type IntegrationCardProps = {
 };
 
 function IntegrationCard({ Icon, title, description, tag }: IntegrationCardProps) {
+  const router = useRouter();
+  const { currentUser } = useAuth();
+
+  const handleWaitlistClick = () => {
+    if (currentUser) {
+      router.push('/dashboard');
+    } else {
+      router.push('/signup');
+    }
+  };
+
   return (
     <Card className="w-full h-full flex flex-col shadow-md hover:shadow-lg transition-shadow duration-300">
       <CardHeader>
@@ -94,7 +108,11 @@ function IntegrationCard({ Icon, title, description, tag }: IntegrationCardProps
 
             </>
           ) : (
-            <Button variant="primary" className="shadow-md bg-[#6563F2] hover:bg-[#5a59de] text-white font-bold px-7 py-2 rounded-full text-lg">
+            <Button
+              variant="primary"
+              className="shadow-md bg-[#6563F2] hover:bg-[#5a59de] text-white font-bold px-7 py-2 rounded-full text-lg"
+              onClick={handleWaitlistClick}
+            >
               Join waitlist &rarr;
             </Button>
           )}

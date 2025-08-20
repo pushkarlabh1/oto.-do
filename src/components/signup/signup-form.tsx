@@ -122,10 +122,6 @@ export function SignupForm() {
     <div className="w-[90%] max-w-sm p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       <div id="recaptcha-container" />
 
-      <div className="text-center">
-        <h1 className="text-4xl font-extrabold text-[#9C42FF]">oto.do</h1>
-      </div>
-
       <div className="space-y-2 text-center pt-5">
         <h2 className="text-2xl font-bold text-[#9C42FF]">Sign Up to oto.do</h2>
         <p className="text-sm text-black">Enter your phone number to continue.</p>
