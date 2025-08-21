@@ -78,17 +78,14 @@ export function InfoForm({ agent }: { agent?: string | null }) {
   
   const expectationPlaceholder = agent?.toLowerCase().includes('stock')
     ? 'e.g., I want to get real-time stock alerts, analyze market sentiment...'
-    : agent?.toLowerCase().includes('dating')
+    : agent?.toLowerCase().includes('swiping')
     ? 'e.g., I want it to swipe right on profiles that match my preferences...'
     : 'Let us know what you want this agent to do...';
 
   return (
     <div className="w-[90%] max-w-lg p-6 md:p-8 space-y-6 bg-white rounded-xl shadow-lg font-sans">
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold text-primary">Join the Waitlist</h2>
-        <p className="text-muted-foreground">
-          Please provide your email and let us know what you expect from our upcoming agents.
-        </p>
+        <h2 className="text-2xl md:text-3xl font-bold md:font-extrabold text-primary">Join the Waitlist</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

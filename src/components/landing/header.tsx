@@ -19,7 +19,7 @@ export function Header() {
   return (
     <header className="py-4 bg-white sticky top-0 z-40 border-b">
       <div className="mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-2xl font-bold text-primary">
+        <Link href="/" className="text-3xl font-bold text-primary">
           oto.do
         </Link>
         
@@ -49,7 +49,7 @@ export function Header() {
             <SheetContent side="right" className="w-3/5 max-w-xs">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <div className="flex flex-col items-center gap-4 p-4">
-                <Link href="/" className="text-2xl font-bold text-primary mb-4">
+                <Link href="/" className="text-3xl font-bold text-primary mb-4">
                   oto.do
                 </Link>
                 {currentUser ? (
