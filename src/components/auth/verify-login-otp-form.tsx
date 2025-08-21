@@ -10,7 +10,7 @@ import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
-export function VerifyLoginOtpForm() {
+export function VerifyLoginOtpForm({ source, agent }: { source?: string | null; agent?: string | null }) {
   const [otp, setOtp] = useState('');
   const router = useRouter();
   const { confirmationResult } = useAuth();
@@ -36,16 +36,30 @@ export function VerifyLoginOtpForm() {
 
         const successToast = toast.success("OTP verified successfully!");
 
-        setTimeout(async () => {
+        // Check user's profile and waitlist status
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+        const hasSubmittedWaitlist = userData?.hasSubmittedWaitlist;
+        const hasName = userData?.name;
+
+        setTimeout(() => {
           toast.dismiss(successToast);
           toast.success("WELCOME BACK!");
 
-          // Check if user has a profile
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists() && userDoc.data().name) {
-            router.push('/dashboard');
+          if (!hasName) {
+            const queryParams = new URLSearchParams();
+            if (source) queryParams.set('source', source);
+            if (agent) queryParams.set('agent', agent);
+            router.push(`/enter-name?${queryParams.toString()}`);
+            return;
+          }
+
+          if (source === 'waitlist' && !hasSubmittedWaitlist) {
+            const queryParams = new URLSearchParams();
+            if (agent) queryParams.set('agent', agent);
+            router.push(`/info-gathering?${queryParams.toString()}`);
           } else {
-            router.push('/enter-name');
+            router.push('/dashboard');
           }
         }, 1000);
         

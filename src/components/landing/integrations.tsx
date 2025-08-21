@@ -8,6 +8,8 @@ import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
+import { doc, getDoc }from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const integrationCategories = {
   commute: {
@@ -15,6 +17,7 @@ const integrationCategories = {
     Icon: Car,
     integrations: [
       {
+        id: 'ride-booking',
         title: 'Ride booking agent',
         description: 'Automates ride bookings across providers like Uber, OLA etc.',
         tag: 'Active',
@@ -26,6 +29,7 @@ const integrationCategories = {
     Icon: BarChart3,
     integrations: [
       {
+        id: 'ai-stock-analyst',
         title: 'AI stock analyst agent',
         description: 'Smart assistant powered by AI analytics assists you in analysing news and stocks',
         tag: 'Coming soon',
@@ -37,6 +41,7 @@ const integrationCategories = {
     Icon: Heart,
     integrations: [
       {
+        id: 'auto-swiping',
         title: 'Auto swiping agent',
         description: 'Automatically swipes for you on dating apps based on your preference.',
         tag: 'Coming soon',
@@ -46,21 +51,39 @@ const integrationCategories = {
 };
 
 type IntegrationCardProps = {
+  id: string;
   Icon?: LucideIcon;
   title: string;
   description: string;
   tag?: 'Active' | 'Coming soon';
 };
 
-function IntegrationCard({ Icon, title, description, tag }: IntegrationCardProps) {
+function IntegrationCard({ id, Icon, title, description, tag }: IntegrationCardProps) {
   const router = useRouter();
   const { currentUser } = useAuth();
 
-  const handleWaitlistClick = () => {
+  const handleWaitlistClick = async () => {
     if (currentUser) {
-      router.push('/dashboard');
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.data();
+
+      let hasJoinedWaitlist = false;
+      if (userData) {
+        if (id === 'ai-stock-analyst' && userData.hasSubmittedStockIntake) {
+          hasJoinedWaitlist = true;
+        } else if (id === 'auto-swiping' && userData.hasSubmittedAutoSwipingIntake) {
+          hasJoinedWaitlist = true;
+        }
+      }
+
+      if (hasJoinedWaitlist) {
+        router.push('/dashboard');
+      } else {
+        router.push(`/info-gathering?agent=${encodeURIComponent(title)}`);
+      }
     } else {
-      router.push('/signup');
+      router.push(`/signup?source=waitlist&agent=${encodeURIComponent(title)}`);
     }
   };
 
@@ -94,22 +117,20 @@ function IntegrationCard({ Icon, title, description, tag }: IntegrationCardProps
           {tag === 'Active' ? (
             <>
               <Button
-  variant="link"
-  className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white"
->
-  Details
-</Button>
-<Button
-  variant="link"
-  className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white"
->
-  Pricing
-</Button>
-
+                variant="link"
+                className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white"
+              >
+                Details
+              </Button>
+              <Button
+                variant="link"
+                className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white"
+              >
+                Pricing
+              </Button>
             </>
           ) : (
             <Button
-              variant="primary"
               className="shadow-md bg-[#6563F2] hover:bg-[#5a59de] text-white font-bold px-7 py-2 rounded-full text-lg"
               onClick={handleWaitlistClick}
             >

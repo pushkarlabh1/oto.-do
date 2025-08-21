@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -39,11 +40,31 @@ export function Combobox({
   triggerClassName,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const displayValue =
     options.find((option) => option.value === value)?.value ||
     placeholder ||
     "Select option..."
+
+  if (!isMounted) {
+    return (
+      <Button
+        variant="outline"
+        role="combobox"
+        aria-expanded={open}
+        className={cn("flex items-center justify-center gap-1", triggerClassName)}
+        disabled
+      >
+        {placeholder || "Select option..."}
+        <ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+      </Button>
+    )
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

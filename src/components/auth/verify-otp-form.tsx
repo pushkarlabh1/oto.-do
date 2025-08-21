@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/context/auth-context";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
-export function VerifyOtpForm() {
+export function VerifyOtpForm({ source, agent }: { source?: string | null, agent?: string | null }) {
   const [otp, setOtp] = useState('');
   const router = useRouter();
   const { confirmationResult } = useAuth();
@@ -31,7 +31,16 @@ export function VerifyOtpForm() {
       try {
         await confirmationResult.confirm(otp);
         toast.success("OTP verified successfully!");
-        router.push('/enter-name');
+        
+        const queryParams = new URLSearchParams();
+        if (source) {
+          queryParams.set('source', source);
+        }
+        if (agent) {
+          queryParams.set('agent', agent);
+        }
+        router.push(`/enter-name?${queryParams.toString()}`);
+
       } catch (error) {
         console.error("Error verifying OTP", error);
         toast.error("Invalid OTP. Please try again.");

@@ -12,7 +12,7 @@ import { auth, db } from "@/firebase";
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { useAuth } from "@/context/auth-context";
 
-export function EnterNameForm() {
+export function EnterNameForm({ source, agent }: { source?: string | null; agent?: string | null }) {
   const router = useRouter();
   const { currentUser, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
@@ -61,13 +61,28 @@ export function EnterNameForm() {
       }
 
       toast.success(`Welcome, ${trimmed}!`);
-      router.push("/dashboard");
+      
+      if (source === 'waitlist') {
+        const queryParams = new URLSearchParams();
+        if (agent) {
+          queryParams.set('agent', agent);
+        }
+        router.push(`/info-gathering?${queryParams.toString()}`);
+      } else {
+        router.push("/dashboard");
+      }
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleContinue();
   };
 
   return (
@@ -77,24 +92,26 @@ export function EnterNameForm() {
         <p className="text-sm text-black">Please enter your name to continue.</p>
       </div>
 
-      <div className="space-y-4 pt-2">
-        <Input
-          type="text"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="h-12 border-[#E0E0E0] rounded-lg px-3"
-          disabled={saving}
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4 pt-2">
+          <Input
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-12 border-[#E0E0E0] rounded-lg px-3"
+            disabled={saving}
+          />
+        </div>
 
-      <Button
-        onClick={handleContinue}
-        disabled={saving}
-        className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold disabled:opacity-60"
-      >
-        {saving ? "Saving..." : "CONTINUE"}
-      </Button>
+        <Button
+          type="submit"
+          disabled={saving}
+          className="w-full h-11 text-xl font-semibold text-white bg-[#9C42FF] rounded-full hover:bg-white hover:text-[#9C42FF] hover:border-2 hover:border-[#9C42FF] hover:font-extrabold disabled:opacity-60"
+        >
+          {saving ? "Saving..." : "CONTINUE"}
+        </Button>
+      </form>
     </div>
   );
 }

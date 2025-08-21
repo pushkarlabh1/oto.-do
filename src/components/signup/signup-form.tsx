@@ -19,7 +19,7 @@ import { collection, query, where, getDocs, limit } from "firebase/firestore";
 
 import { useAuth } from "@/context/auth-context";
 
-export function SignupForm() {
+export function SignupForm({ source, agent }: { source?: string | null, agent?: string | null }) {
   const router = useRouter();
   const { setConfirmationResult } = useAuth();
 
@@ -52,7 +52,7 @@ export function SignupForm() {
       });
       setRecaptchaVerifier(verifier);
     }
-  }, [recaptchaVerifier]);
+  }, []);
 
   function normalizePhone(localDigits: string, dialCode: string) {
     const digitsOnly = localDigits.replace(/\D+/g, "");
@@ -64,12 +64,14 @@ export function SignupForm() {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
+
+    setIsLoading(true);
+    
     if (!recaptchaVerifier) {
-      toast.error("reCAPTCHA not ready. Please wait a moment and try again.");
+      toast.error("reCAPTCHA not initialized. Please try again.");
+      setIsLoading(false);
       return;
     }
-    
-    setIsLoading(true);
 
     try {
       const selectedCountry = countryOptions.find((c) => c.value === countryValue);
@@ -80,26 +82,30 @@ export function SignupForm() {
       const q = query(usersRef, where("phone", "==", fullPhoneNumber), limit(1));
       const snap = await getDocs(q);
 
-      if (!snap.empty) {
-        toast.success("You already have an active account. Please verify the OTP to log in.");
-        const confirmationResult = await signInWithPhoneNumber(
-          auth,
-          fullPhoneNumber,
-          recaptchaVerifier
-        );
-        setConfirmationResult(confirmationResult);
-        router.push("/verify-login");
-        return;
-      }
-
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         fullPhoneNumber,
         recaptchaVerifier
       );
       setConfirmationResult(confirmationResult);
+
+      const queryParams = new URLSearchParams();
+      if(source) {
+        queryParams.set('source', source);
+      }
+      if(agent) {
+        queryParams.set('agent', agent);
+      }
+
+      if (!snap.empty) {
+        toast.success("You already have an active account. Please verify the OTP to log in.");
+        router.push(`/verify-login?${queryParams.toString()}`);
+        return;
+      }
+      
       toast.success("OTP sent successfully!");
-      router.push("/verify-otp");
+      router.push(`/verify-otp?${queryParams.toString()}`);
+
     } catch (error: any) {
       console.error("Error sending OTP", error);
 

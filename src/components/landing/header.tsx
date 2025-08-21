@@ -1,11 +1,21 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import Link from 'next/link';
+import { useAuth } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
 
 export function Header() {
+  const { currentUser } = useAuth();
+  const router = useRouter();
+
+  const handleDashboardClick = () => {
+    router.push('/dashboard');
+  };
+
   return (
     <header className="py-4 bg-white sticky top-0 z-40 border-b">
       <div className="mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -14,12 +24,18 @@ export function Header() {
         </Link>
         
         <nav className="hidden md:flex items-center gap-3 " >
-          <Link href="/login" passHref>
-            <Button variant="ghost" className="hover:font-bold">Login</Button>
-          </Link>
-          <Link href="/signup" passHref>
-            <Button className="hover:font-bold" >Sign Up</Button>
-          </Link>
+          {currentUser ? (
+            <Button onClick={handleDashboardClick} className="hover:font-bold">Dashboard</Button>
+          ) : (
+            <>
+              <Link href="/login" passHref>
+                <Button variant="ghost" className="hover:font-bold">Login</Button>
+              </Link>
+              <Link href="/signup" passHref>
+                <Button className="hover:font-bold" >Sign Up</Button>
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="md:hidden">
@@ -31,16 +47,23 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <div className="flex flex-col gap-4 p-6">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <div className="flex flex-col items-center gap-4 p-6">
                 <Link href="/" className="text-2xl font-bold text-primary mb-4">
                   oto.do
                 </Link>
-                <Link href="/login" passHref>
-                  <Button variant="ghost" className="w-full justify-center text-lg hover:font-bold">Login</Button>
-                </Link>
-                <Link href="/signup" passHref>
-                  <Button className="w-full text-lg hover:font-bold" style={{ backgroundColor: "#6F5CFF" }}>Sign Up</Button>
-                </Link>
+                {currentUser ? (
+                  <Button onClick={handleDashboardClick} className="w-full text-lg hover:font-bold" style={{ backgroundColor: "#6F5CFF" }}>Dashboard</Button>
+                ) : (
+                  <>
+                    <Link href="/login" passHref>
+                      <Button variant="ghost" className="w-full justify-center text-lg hover:font-bold">Login</Button>
+                    </Link>
+                    <Link href="/signup" passHref>
+                      <Button className="w-full text-lg hover:font-bold" style={{ backgroundColor: "#6F5CFF" }}>Sign Up</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>

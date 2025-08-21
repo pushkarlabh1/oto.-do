@@ -43,7 +43,8 @@ export function LoginForm() {
       });
       setRecaptchaVerifier(verifier);
     }
-  }, [recaptchaVerifier]);
+  }, []); // Empty dependency array ensures this runs only once on mount
+
 
   function normalizePhone(localDigits: string, dialCode: string) {
     const digitsOnly = localDigits.replace(/\D+/g, "");
@@ -55,12 +56,15 @@ export function LoginForm() {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
+    
+    setIsLoading(true);
+
     if (!recaptchaVerifier) {
-      toast.error("reCAPTCHA not ready. Please wait a moment and try again.");
-      return;
+        toast.error("reCAPTCHA not initialized. Please try again.");
+        setIsLoading(false);
+        return;
     }
 
-    setIsLoading(true);
     const selectedCountry = countryOptions.find(c => c.value === countryValue);
     const countryCode = selectedCountry ? selectedCountry.code : '';
     const fullPhoneNumber = normalizePhone(phoneNumber, countryCode);

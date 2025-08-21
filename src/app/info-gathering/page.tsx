@@ -1,30 +1,29 @@
 
 'use client';
-import { EnterNameForm } from '@/components/auth/enter-name-form';
+
+import { InfoForm } from '@/components/info-gathering/info-form';
 import { AuthHeader } from '@/components/auth/auth-header';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
-function EnterNameContent() {
+function InfoGatheringContent() {
   const searchParams = useSearchParams();
-  const source = searchParams.get('source');
   const agent = searchParams.get('agent');
 
   return (
     <>
       <AuthHeader />
       <div className="flex items-start justify-center min-h-screen bg-[#F9F7FE] pt-20">
-        <EnterNameForm source={source} agent={agent} />
+        <InfoForm agent={agent} />
       </div>
     </>
   );
 }
 
-
-export default function EnterNamePage() {
+export default function InfoGatheringPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <EnterNameContent />
+      <InfoGatheringContent />
     </Suspense>
   )
 }
