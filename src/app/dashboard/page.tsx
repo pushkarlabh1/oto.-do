@@ -10,6 +10,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 import { AuthHeader } from "@/components/auth/auth-header";
 import toast from "react-hot-toast";
+import { Separator } from "@/components/ui/separator";
 
 function DashboardContent() {
   const router = useRouter();
@@ -21,16 +22,14 @@ function DashboardContent() {
   const [showRedirectMessage, setShowRedirectMessage] = useState(false);
 
   useEffect(() => {
-    // Check for redirect param once
     const intakeSuccess = searchParams.get('intake_success') === 'true';
     if (intakeSuccess) {
       setShowRedirectMessage(true);
-       // Clean up URL to prevent message from re-appearing on refresh but keep other params if needed
        const newParams = new URLSearchParams(searchParams.toString());
        newParams.delete('intake_success');
        router.replace(`/dashboard?${newParams.toString()}`, {scroll: false});
     }
-  }, []); // Empty array ensures this runs only once on mount
+  }, []); 
   
   useEffect(() => {
     if (authLoading) {
@@ -51,9 +50,8 @@ function DashboardContent() {
           const userData = userSnap.data();
           if (userData.name) {
             setDisplayName(userData.name);
-            const agents = new Set<string>(); // Use a Set to avoid duplicates
+            const agents = new Set<string>();
 
-            // Check for persistent flags from Firestore
             if (userData.hasSubmittedStockIntake) {
                 agents.add("AI stock analyst agent");
             }
@@ -61,7 +59,6 @@ function DashboardContent() {
                 agents.add("Auto swiping agent");
             }
             
-            // If redirected from intake, ensure the new agent is in the list immediately
             const justAddedAgent = searchParams.get('agent');
             if (showRedirectMessage && justAddedAgent) {
               agents.add(justAddedAgent);
@@ -69,12 +66,10 @@ function DashboardContent() {
 
             setWaitlistedAgents(Array.from(agents));
           } else {
-            // If user exists but has no name, redirect to set it
             router.replace("/enter-name");
             return;
           }
         } else {
-          // This case is unlikely if they are logged in, but as a fallback...
           router.replace("/enter-name");
           return;
         }
@@ -122,22 +117,27 @@ function DashboardContent() {
         <h2 className="text-2xl font-semibold text-[#6469ED]">Welcome, {displayName}</h2>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-xl shadow p-6">
-           <h3 className="text-lg font-semibold mb-4">Your Waitlists</h3>
-           
-           {waitlistedAgents.length > 0 ? (
-            <div className="space-y-2">
-              {waitlistedAgents.map(agentName => (
-                  <p key={agentName} className="text-green-600 font-semibold">
-                    You will be notified via email whenever our {agentName} is ready to use.
-                  </p>
-              ))}
+      <main className="max-w-4xl mx-auto px-4 space-y-4">
+        {waitlistedAgents.length > 0 ? (
+          <>
+            <div className="bg-white rounded-xl shadow p-6">
+                <h3 className="text-lg font-semibold">Your Waitlists</h3>
             </div>
-           ) : (
-             <p className="text-muted-foreground">You have not joined any waitlists yet.</p>
-           )}
-        </div>
+            {waitlistedAgents.map((agentName) => (
+              <div key={agentName} className="bg-white rounded-xl shadow p-6">
+                <p className="text-green-600 font-semibold">
+                  You will be notified via email whenever our {agentName} is ready to use.
+                </p>
+              </div>
+            ))}
+          </>
+          ) : (
+            <div className="bg-white rounded-xl shadow p-6">
+              <h3 className="text-lg font-semibold">Your Waitlists</h3>
+              <Separator className="my-4" />
+              <p className="text-muted-foreground">You have not joined any waitlists yet.</p>
+            </div>
+          )}
       </main>
     </div>
   );

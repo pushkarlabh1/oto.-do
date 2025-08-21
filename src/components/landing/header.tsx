@@ -46,9 +46,9 @@ export function Header() {
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
+            <SheetContent side="right" className="w-3/5 max-w-xs">
               <SheetTitle className="sr-only">Menu</SheetTitle>
-              <div className="flex flex-col items-center gap-4 p-6">
+              <div className="flex flex-col items-center gap-4 p-4">
                 <Link href="/" className="text-2xl font-bold text-primary mb-4">
                   oto.do
                 </Link>
