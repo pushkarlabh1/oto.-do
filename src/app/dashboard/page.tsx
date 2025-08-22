@@ -8,7 +8,7 @@ import { auth, db } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
-import { AuthHeader } from "@/components/auth/auth-header";
+import { DashboardHeader } from "@/components/auth/dashboard-header";
 import toast from "react-hot-toast";
 import { Separator } from "@/components/ui/separator";
 
@@ -105,7 +105,7 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-[#F9F7FE]">
-      <AuthHeader />
+      <DashboardHeader />
       <header className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-3xl font-bold">Dashboard</h1>
