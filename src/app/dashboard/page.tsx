@@ -70,6 +70,8 @@ function DashboardContent() {
             return;
           }
         } else {
+          // This case can happen if the user exists in Auth but not in Firestore yet.
+          // Let's redirect to enter-name to create the user doc.
           router.replace("/enter-name");
           return;
         }

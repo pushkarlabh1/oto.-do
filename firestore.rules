@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow guest messages to be created by anyone
+    match /guestMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // Allow users to create messages in their own messages subcollection
+    match /users/{userId}/messages/{messageId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allow users to read their own user document
+    match /users/{userId} {
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null;
+    }
+  }
+}
