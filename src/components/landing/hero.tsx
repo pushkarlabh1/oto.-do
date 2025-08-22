@@ -33,7 +33,7 @@ export function Hero() {
             data-ai-hint="logo"
           />
         </div>
-        <h1 className="text-4xl font-bold text-primary font-headline sm:text-8xl md:text-[#6F5CFF]">
+        <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold text-primary font-headline md:text-[#6F5CFF]">
           oto.do
         </h1>
 
