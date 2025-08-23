@@ -163,7 +163,7 @@ export default function ReachOutPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-800">{item.title}</h3>
-                      <p className="text-gray-600 break-all">{item.value}</p>
+                      <p className="text-gray-600 break-words">{item.value}</p>
                     </div>
                   </div>
                 ))}
