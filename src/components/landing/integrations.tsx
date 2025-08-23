@@ -125,11 +125,13 @@ function IntegrationCard({ id, Icon, title, description, tag }: IntegrationCardP
                 <Link href="https://play.google.com/store/apps/details?id=com.moontropy.otodo&pcampaignid=web_share" target="_blank">Details</Link>
               </Button>
               <Button
+                asChild
                 variant="link"
-                className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white"
-              >
-                Pricing
+                className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white">
+                  <Link href="https://play.google.com/store/apps/details?id=com.moontropy.otodo&pcampaignid=web_share" target="_blank">Pricing</Link>
               </Button>
+
+                
             </>
           ) : (
             <Button
