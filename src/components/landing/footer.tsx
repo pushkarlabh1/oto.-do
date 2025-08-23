@@ -1,10 +1,12 @@
-import { Twitter, Linkedin } from "lucide-react";
+
+import { Linkedin } from "lucide-react";
 import Link from 'next/link';
+import { XIcon } from '@/components/icons/x-icon';
 
 export function Footer() {
   const socialLinks = [
-    { name: 'Twitter', icon: Twitter, href: '#' },
-    { name: 'LinkedIn', icon: Linkedin, href: '#' },
+    { name: 'Twitter', icon: XIcon, href: '#', color: 'text-black', hoverColor: 'hover:text-primary' },
+    { name: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/company/moontropy/posts/', color: 'text-blue-800', hoverColor: 'hover:text-primary' },
   ];
 
   const footerLinks = {
@@ -66,15 +68,17 @@ export function Footer() {
                 <Link
                   key={social.name}
                   href={social.href}
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  target={social.name === 'LinkedIn' ? '_blank' : undefined}
+                  rel={social.name === 'LinkedIn' ? 'noopener noreferrer' : undefined}
+                  className={`${social.color} ${social.hoverColor} transition-colors`}
                 >
                   <social.icon className="h-6 w-6" />
                   <span className="sr-only">{social.name}</span>
                 </Link>
               ))}
             </div>
-            <a href="mailto:hello@oto.do" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-              hello@oto.do
+            <a href="mailto:contact@moontropy.com" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              contact@moontropy.com
             </a>
           </div>
         </div>

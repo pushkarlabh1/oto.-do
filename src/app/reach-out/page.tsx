@@ -66,9 +66,8 @@ const contactInfo = [
 ];
 
 const socialLinks = [
-  { icon: XIcon, href: '#', color: 'text-black', hoverColor: 'bg-gray-800/10' },
-  { icon: Linkedin, href: '#', color: 'text-sky-700', hoverColor: 'bg-sky-700/10' },
-  { icon: Github, href: '#', color: 'text-gray-800', hoverColor: 'bg-gray-800/10' },
+  { name: 'Twitter', icon: XIcon, href: '#', color: 'text-black', hoverColor: 'bg-gray-800/10' },
+  { name: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/company/moontropy/posts/', color: 'text-blue-800', hoverColor: 'bg-sky-700/10' },
 ];
 
 export default function ReachOutPage() {
@@ -250,6 +249,8 @@ export default function ReachOutPage() {
               <Link
                 key={index}
                 href={social.href}
+                target={social.name === 'LinkedIn' ? '_blank' : undefined}
+                rel={social.name === 'LinkedIn' ? 'noopener noreferrer' : undefined}
                 className={`w-12 h-12 flex items-center justify-center rounded-full bg-white transition-colors ${social.hoverColor}`}
               >
                 <social.icon className={`w-6 h-6 ${social.color}`} />
