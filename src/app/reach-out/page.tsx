@@ -28,6 +28,7 @@ const contactInfo = [
     iconColor: 'text-purple-600',
     title: 'Company',
     value: 'Moontropy Private Limited',
+    wrapClass: 'break-words',
   },
   {
     icon: LeafIcon,
@@ -35,6 +36,7 @@ const contactInfo = [
     iconColor: 'text-green-600',
     title: 'CIN',
     value: 'U72900KA2021PTC148310',
+    wrapClass: 'break-all',
   },
   {
     icon: Phone,
@@ -42,6 +44,7 @@ const contactInfo = [
     iconColor: 'text-purple-600',
     title: 'Phone',
     value: '+91 981 068 2949',
+    wrapClass: 'break-words',
   },
   {
     icon: Mail,
@@ -49,6 +52,7 @@ const contactInfo = [
     iconColor: 'text-green-600',
     title: 'Email',
     value: 'contact@moontropy.com',
+    wrapClass: 'break-all',
   },
   {
     icon: MapPin,
@@ -57,6 +61,7 @@ const contactInfo = [
     title: 'Registered Address',
     value:
       '1st Floor, 52, SPD Plaza, 4th A Cross, 5th Block, Near Jyoti Nivas College, Koramangala Bengaluru, Karnataka, India, 560095',
+    wrapClass: 'break-words',
   },
 ];
 
@@ -84,6 +89,13 @@ export default function ReachOutPage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    // Cleanup function to dismiss any active toasts when the component unmounts.
+    return () => {
+      toast.dismiss();
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name || !email || !message) {
@@ -104,7 +116,7 @@ export default function ReachOutPage() {
           createdAt: serverTimestamp(),
         });
       } else {
-        // User is not logged in, save to guestMessages collection
+        // User is not logged in, save to top-level messages collection
         await addDoc(collection(db, 'messages'), {
             name,
             email,
@@ -153,7 +165,7 @@ export default function ReachOutPage() {
             {/* Contact Info Column */}
             <div className="space-y-8">
               <h2 className="text-3xl font-bold text-primary text-center md:text-left">Contact Us</h2>
-              <div className="bg-white p-8 rounded-2xl shadow-sm space-y-8">
+              <div className="bg-white px-8 py-4 rounded-2xl shadow-sm space-y-8">
                 {contactInfo.map((item, index) => (
                   <div key={index} className="flex items-start gap-5">
                     <div
@@ -163,7 +175,7 @@ export default function ReachOutPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-800">{item.title}</h3>
-                      <p className="text-gray-600 break-words">{item.value}</p>
+                      <p className={`text-gray-600 ${item.wrapClass}`}>{item.value}</p>
                     </div>
                   </div>
                 ))}
@@ -176,7 +188,7 @@ export default function ReachOutPage() {
               <p className="text-gray-600">
                 Have a question or a new integration idea? Let us know!
               </p>
-              <div className="bg-white p-8 rounded-2xl shadow-sm text-left">
+              <div className="bg-white px-8 py-4 rounded-2xl shadow-sm text-left">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
@@ -252,3 +264,5 @@ export default function ReachOutPage() {
     </div>
   );
 }
+
+    
