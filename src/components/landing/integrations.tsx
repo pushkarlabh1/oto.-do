@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { doc, getDoc }from 'firebase/firestore';
 import { db } from '@/firebase';
+import Link from 'next/link';
 
 const integrationCategories = {
   commute: {
@@ -117,10 +118,11 @@ function IntegrationCard({ id, Icon, title, description, tag }: IntegrationCardP
           {tag === 'Active' ? (
             <>
               <Button
+                asChild
                 variant="link"
                 className="px-4 py-2 h-auto text-primary font-semibold text-black rounded-full border border-[#6F5CFF] hover:bg-[#6F5CFF] hover:text-white"
               >
-                Details
+                <Link href="https://play.google.com/store/apps/details?id=com.moontropy.otodo&pcampaignid=web_share" target="_blank">Details</Link>
               </Button>
               <Button
                 variant="link"
