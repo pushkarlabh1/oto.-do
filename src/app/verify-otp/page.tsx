@@ -7,6 +7,8 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { AlertCircle } from 'lucide-react';
+import { AuthFooter } from '@/components/auth/auth-footer';
+import { Separator } from '@/components/ui/separator';
 
 function VerifyOtpContent() {
   const searchParams = useSearchParams();
@@ -49,12 +51,14 @@ function VerifyOtpContent() {
   }, [isNewUser]);
   
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-[#F9F7FE]">
       <AuthHeader />
-      <div className="flex flex-col items-center min-h-screen bg-[#F9F7FE] pt-20 gap-8 w-full">
+      <main className="flex-grow flex flex-col items-center pt-20 gap-8 w-full">
         <VerifyOtpForm source={source} agent={agent} />
-      </div>
-    </>
+      </main>
+      <Separator />
+      <AuthFooter />
+    </div>
   );
 }
 

@@ -7,6 +7,8 @@ import { SignupForm } from '@/components/signup/signup-form';
 import { AuthHeader } from '@/components/auth/auth-header';
 import { useAuth } from '@/context/auth-context';
 import { Loader2 } from 'lucide-react';
+import { AuthFooter } from '@/components/auth/auth-footer';
+import { Separator } from '@/components/ui/separator';
 
 
 function SignupPageContent() {
@@ -38,12 +40,14 @@ function SignupPageContent() {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-[#F9F7FE]">
       <AuthHeader />
-      <div className="flex items-start justify-center min-h-screen bg-[#F9F7FE] pt-20">
+      <main className="flex-grow flex items-start justify-center pt-20">
         <SignupForm source={source} agent={agent} />
-      </div>
-    </>
+      </main>
+      <Separator />
+      <AuthFooter />
+    </div>
   );
 }
 

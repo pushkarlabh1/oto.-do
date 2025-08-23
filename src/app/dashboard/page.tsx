@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react";
 import { DashboardHeader } from "@/components/auth/dashboard-header";
 import toast from "react-hot-toast";
 import { Separator } from "@/components/ui/separator";
+import { AuthFooter } from "@/components/auth/auth-footer";
 
 function DashboardContent() {
   const router = useRouter();
@@ -104,43 +105,47 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F7FE]">
+    <div className="flex flex-col min-h-screen bg-[#F9F7FE]">
       <DashboardHeader />
-      <header className="max-w-4xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 rounded bg-black text-white hover:opacity-90"
-          >
-            Logout
-          </button>
-        </div>
-        <h2 className="text-2xl font-semibold text-[#6469ED]">Welcome, {displayName}</h2>
-      </header>
+      <main className="flex-grow">
+        <header className="max-w-4xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 rounded bg-black text-white hover:opacity-90"
+            >
+              Logout
+            </button>
+          </div>
+          <h2 className="text-2xl font-semibold text-[#6469ED]">Welcome, {displayName}</h2>
+        </header>
 
-      <main className="max-w-4xl mx-auto px-4 space-y-4">
-        {waitlistedAgents.length > 0 ? (
-          <>
-            <div className="bg-white rounded-xl shadow p-6">
-                <h3 className="text-lg font-semibold">Your Waitlists</h3>
-            </div>
-            {waitlistedAgents.map((agentName) => (
-              <div key={agentName} className="bg-white rounded-xl shadow p-6">
-                <p className="text-green-600 font-semibold">
-                  You will be notified via email whenever our {agentName} is ready to use.
-                </p>
+        <div className="max-w-4xl mx-auto px-4 space-y-4">
+          {waitlistedAgents.length > 0 ? (
+            <>
+              <div className="bg-white rounded-xl shadow p-6">
+                  <h3 className="text-lg font-semibold">Your Waitlists</h3>
               </div>
-            ))}
-          </>
-          ) : (
-            <div className="bg-white rounded-xl shadow p-6">
-              <h3 className="text-lg font-semibold">Your Waitlists</h3>
-              <Separator className="my-4" />
-              <p className="text-muted-foreground">You have not joined any waitlists yet.</p>
-            </div>
-          )}
+              {waitlistedAgents.map((agentName) => (
+                <div key={agentName} className="bg-white rounded-xl shadow p-6">
+                  <p className="text-green-600 font-semibold">
+                    You will be notified via email whenever our {agentName} is ready to use.
+                  </p>
+                </div>
+              ))}
+            </>
+            ) : (
+              <div className="bg-white rounded-xl shadow p-6">
+                <h3 className="text-lg font-semibold">Your Waitlists</h3>
+                <Separator className="my-4" />
+                <p className="text-muted-foreground">You have not joined any waitlists yet.</p>
+              </div>
+            )}
+        </div>
       </main>
+      <Separator />
+      <AuthFooter />
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { InfoForm } from '@/components/info-gathering/info-form';
 import { AuthHeader } from '@/components/auth/auth-header';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
+import { AuthFooter } from '@/components/auth/auth-footer';
+import { Separator } from '@/components/ui/separator';
 
 function InfoGatheringContent() {
   const searchParams = useSearchParams();
@@ -15,12 +17,14 @@ function InfoGatheringContent() {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-[#F9F7FE]">
       <AuthHeader />
-      <div className="flex items-start justify-center min-h-screen bg-[#F9F7FE] pt-8 sm:pt-20">
+      <main className="flex-grow flex items-start justify-center pt-8 sm:pt-20">
         <InfoForm agent={agent} />
-      </div>
-    </>
+      </main>
+      <Separator />
+      <AuthFooter />
+    </div>
   );
 }
 

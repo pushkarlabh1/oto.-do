@@ -7,6 +7,8 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { AuthFooter } from '@/components/auth/auth-footer';
+import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
   const { currentUser, loading } = useAuth();
@@ -30,11 +32,13 @@ export default function LoginPage() {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-[#F9F7FE]">
       <AuthHeader />
-      <div className="flex items-start justify-center min-h-screen bg-[#F9F7FE] pt-20">
+      <main className="flex-grow flex items-start justify-center pt-20">
         <LoginForm />
-      </div>
-    </>
+      </main>
+      <Separator />
+      <AuthFooter />
+    </div>
   );
 }
